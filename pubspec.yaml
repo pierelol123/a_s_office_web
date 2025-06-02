@@ -30,6 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  googleapis: ^11.4.0
+  googleapis_auth: ^1.4.1
+  file_picker: ^6.1.1
+  http: ^1.1.0
+  desktop_drop: ^0.4.4 # For drag and drop
+  super_clipboard: ^0.8.12  # For advanced clipboard access
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -56,6 +62,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+  - lib/data.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
