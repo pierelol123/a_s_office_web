@@ -8,6 +8,9 @@ class Product {
   final String description;
   final int totalQuantitySold;
   final List<dynamic> buyers;
+  final int pageNumber;
+  final int rowInPage;
+  final double height; // New field for product height
 
   Product({
     required this.productID,
@@ -19,6 +22,9 @@ class Product {
     required this.description,
     required this.totalQuantitySold,
     required this.buyers,
+    required this.pageNumber,
+    required this.rowInPage,
+    required this.height, // New required field
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -32,6 +38,9 @@ class Product {
       description: json['Description'] ?? '',
       totalQuantitySold: json['totalQuantitySold'] ?? 0,
       buyers: json['buyers'] ?? [],
+      pageNumber: json['pageNumber'] ?? 1,
+      rowInPage: json['rowInPage'] ?? 1,
+      height: (json['height'] ?? 160.0).toDouble(), // Default height 160
     );
   }
 
@@ -46,6 +55,9 @@ class Product {
       'Description': description,
       'totalQuantitySold': totalQuantitySold,
       'buyers': buyers,
+      'pageNumber': pageNumber,
+      'rowInPage': rowInPage,
+      'height': height, // New field
     };
   }
 }
