@@ -5,11 +5,10 @@ import 'package:http/http.dart' as http;
 
 class GoogleDriveService {
   static const _scopes = [drive.DriveApi.driveFileScope];
+  static const String _shareWithEmail = 'aswebacc12@gmail.com'; // The Gmail account to share with
   
   // Your actual Google Cloud service account credentials
-  static const _credentials = {
 
-  };
 
   // Add method to find the shared folder
   static Future<String?> findAswebImagesFolder() async {
@@ -96,29 +95,38 @@ class GoogleDriveService {
     String? folderId,
   }) async {
     try {
-      print('Starting upload to Google Drive...');
+      print('=== Starting Google Drive Upload ===');
+      print('File name: $fileName');
+      print('File size: ${imageBytes.length} bytes');
       
       // Authenticate using your service account
       final accountCredentials = ServiceAccountCredentials.fromJson(_credentials);
-      final client = await clientViaServiceAccount(accountCredentials, _scopes);
+      print('Service account credentials loaded');
       
+      final client = await clientViaServiceAccount(accountCredentials, _scopes);
       print('Authentication successful');
       
       // Create Drive API instance
       final driveApi = drive.DriveApi(client);
+      print('Drive API instance created');
       
-      // Create file metadata - upload to root
+      // Create file metadata
       final driveFile = drive.File()
-        ..name = fileName;
+        ..name = fileName
+        ..description = 'Image uploaded from A&S Office Web App'
+        ..parents = folderId != null ? [folderId] : null; // Set parent folder if provided
     
       // Create media
+      final contentType = _getContentType(fileName);
+      print('Content type: $contentType');
+      
       final media = drive.Media(
         Stream.fromIterable([imageBytes]),
         imageBytes.length,
-        contentType: _getContentType(fileName),
+        contentType: contentType,
       );
       
-      print('Uploading file: $fileName to service account drive');
+      print('Starting file upload...');
       
       // Upload file
       final response = await driveApi.files.create(
@@ -126,39 +134,70 @@ class GoogleDriveService {
         uploadMedia: media,
       );
       
-      print('File uploaded with ID: ${response.id}');
+      print('File uploaded successfully with ID: ${response.id}');
       
-      // Make file publicly viewable
-      await driveApi.permissions.create(
-        drive.Permission()
-          ..role = 'reader'
-          ..type = 'anyone',
-        response.id!,
-      );
-    
-      // SHARE WITH YOUR PERSONAL ACCOUNT - Replace with your actual email
-      await driveApi.permissions.create(
-        drive.Permission()
-          ..role = 'writer' // or 'reader' if you prefer
-          ..type = 'user'
-          ..emailAddress = 'aswebacc12@gmail.com', // REPLACE THIS
-        response.id!,
-      );
-    
-      print('File shared with your personal account');
-      print('File permissions set to public');
+      if (response.id == null) {
+        throw Exception('Upload succeeded but no file ID returned');
+      }
       
-      // Return the direct view URL
+      // Set up permissions - both public and specific Gmail account
+      print('Setting file permissions...');
+      
+      // 1. Make file publicly viewable (for general access)
+      try {
+        await driveApi.permissions.create(
+          drive.Permission()
+            ..role = 'reader'
+            ..type = 'anyone',
+          response.id!,
+        );
+        print('✅ Public read permission set successfully');
+      } catch (e) {
+        print('⚠️ Warning: Could not set public permission: $e');
+      }
+      
+      // 2. Share specifically with aswebacc12@gmail.com with editor permissions
+      try {
+        await driveApi.permissions.create(
+          drive.Permission()
+            ..role = 'writer' // Can edit the file
+            ..type = 'user'
+            ..emailAddress = _shareWithEmail,
+          response.id!,
+          sendNotificationEmail: false, // Don't send email notification
+        );
+        print('✅ File shared with $_shareWithEmail (writer permissions)');
+      } catch (e) {
+        print('⚠️ Warning: Could not share with $_shareWithEmail: $e');
+        // Try with reader permissions instead
+        try {
+          await driveApi.permissions.create(
+            drive.Permission()
+              ..role = 'reader' // Can only view the file
+              ..type = 'user'
+              ..emailAddress = _shareWithEmail,
+            response.id!,
+            sendNotificationEmail: false,
+          );
+          print('✅ File shared with $_shareWithEmail (reader permissions)');
+        } catch (e2) {
+          print('❌ Failed to share with $_shareWithEmail: $e2');
+        }
+      }
+      
+      // Generate the direct view URL
       final directUrl = 'https://drive.google.com/uc?export=view&id=${response.id}';
       print('Generated URL: $directUrl');
       
       // Close the HTTP client
       client.close();
+      print('=== Upload completed successfully ===');
       
       return directUrl;
       
-    } catch (e) {
-      print('Error uploading to Google Drive: $e');
+    } catch (e, stackTrace) {
+      print('❌ Error uploading to Google Drive: $e');
+      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -189,6 +228,90 @@ class GoogleDriveService {
     } catch (e) {
       print('Error listing images in aswebimages folder: $e');
       return [];
+    }
+  }
+  
+  // New method to specifically upload to the aswebimages folder and share with Gmail account
+  static Future<String?> uploadImageToAswebFolder({
+    required Uint8List imageBytes,
+    required String fileName,
+  }) async {
+    try {
+      print('=== Uploading to aswebimages folder ===');
+      
+      // First find the aswebimages folder
+      final folderId = await findAswebImagesFolder();
+      if (folderId == null) {
+        print('❌ Cannot upload: aswebimages folder not found');
+        return null;
+      }
+      
+      print('Found aswebimages folder ID: $folderId');
+      
+      // Upload to the specific folder
+      return await uploadImageToDrive(
+        imageBytes: imageBytes,
+        fileName: fileName,
+        folderId: folderId,
+      );
+      
+    } catch (e) {
+      print('❌ Error uploading to aswebimages folder: $e');
+      return null;
+    }
+  }
+  
+  // Method to share an existing file with the Gmail account
+  static Future<bool> shareFileWithGmailAccount(String fileId) async {
+    try {
+      print('=== Sharing file $fileId with $_shareWithEmail ===');
+      
+      final accountCredentials = ServiceAccountCredentials.fromJson(_credentials);
+      final client = await clientViaServiceAccount(accountCredentials, _scopes);
+      final driveApi = drive.DriveApi(client);
+      
+      // Share with writer permissions
+      await driveApi.permissions.create(
+        drive.Permission()
+          ..role = 'writer'
+          ..type = 'user'
+          ..emailAddress = _shareWithEmail,
+        fileId,
+        sendNotificationEmail: false,
+      );
+      
+      client.close();
+      print('✅ File shared successfully with $_shareWithEmail');
+      return true;
+      
+    } catch (e) {
+      print('❌ Error sharing file: $e');
+      return false;
+    }
+  }
+  
+  // Method to check current permissions on a file
+  static Future<void> checkFilePermissions(String fileId) async {
+    try {
+      final accountCredentials = ServiceAccountCredentials.fromJson(_credentials);
+      final client = await clientViaServiceAccount(accountCredentials, _scopes);
+      final driveApi = drive.DriveApi(client);
+      
+      final permissions = await driveApi.permissions.list(fileId);
+      
+      print('=== File Permissions for $fileId ===');
+      if (permissions.permissions != null) {
+        for (var permission in permissions.permissions!) {
+          print('Type: ${permission.type}, Role: ${permission.role}, Email: ${permission.emailAddress}');
+        }
+      } else {
+        print('No permissions found');
+      }
+      
+      client.close();
+      
+    } catch (e) {
+      print('❌ Error checking file permissions: $e');
     }
   }
   
@@ -243,6 +366,23 @@ class GoogleDriveService {
       
     } catch (e) {
       print('❌ Service account access test failed: $e');
+    }
+  }
+
+  // Test method to verify Gmail account sharing works
+  static Future<void> testGmailAccountSharing() async {
+    try {
+      print('=== Testing Gmail Account Sharing ===');
+      print('Target Gmail account: $_shareWithEmail');
+      
+      // You can call this method after uploading a file to test if sharing works
+      print('To test sharing:');
+      print('1. Upload an image using uploadImageToDrive()');
+      print('2. Check if $_shareWithEmail receives access');
+      print('3. Verify the file appears in their Google Drive');
+      
+    } catch (e) {
+      print('❌ Error in Gmail sharing test: $e');
     }
   }
 }

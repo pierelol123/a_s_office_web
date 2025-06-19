@@ -3,6 +3,7 @@ class Product {
   final String productName;
   final double productPrice;
   final int productCapacity;
+  final String? productSku; // New SKU field
   final String imagePath;
   final String dateAdded;
   final String description;
@@ -10,13 +11,14 @@ class Product {
   final List<dynamic> buyers;
   final int pageNumber;
   final int rowInPage;
-  final double height; // New field for product height
+  final double height;
 
   Product({
     required this.productID,
     required this.productName,
     required this.productPrice,
     required this.productCapacity,
+    this.productSku, // Optional field
     required this.imagePath,
     required this.dateAdded,
     required this.description,
@@ -24,7 +26,7 @@ class Product {
     required this.buyers,
     required this.pageNumber,
     required this.rowInPage,
-    required this.height, // New required field
+    required this.height,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class Product {
       productName: json['ProductName'] ?? '',
       productPrice: (json['ProductPrice'] ?? 0).toDouble(),
       productCapacity: json['ProductCapacity'] ?? 0,
+      productSku: json['ProductSku'], // New field
       imagePath: json['ImagePath'] ?? '',
       dateAdded: json['DateAdded'] ?? '',
       description: json['Description'] ?? '',
@@ -40,7 +43,7 @@ class Product {
       buyers: json['buyers'] ?? [],
       pageNumber: json['pageNumber'] ?? 1,
       rowInPage: json['rowInPage'] ?? 1,
-      height: (json['height'] ?? 160.0).toDouble(), // Default height 160
+      height: (json['height'] ?? 160.0).toDouble(),
     );
   }
 
@@ -50,6 +53,7 @@ class Product {
       'ProductName': productName,
       'ProductPrice': productPrice,
       'ProductCapacity': productCapacity,
+      'ProductSku': productSku, // New field
       'ImagePath': imagePath,
       'DateAdded': dateAdded,
       'Description': description,
@@ -57,7 +61,7 @@ class Product {
       'buyers': buyers,
       'pageNumber': pageNumber,
       'rowInPage': rowInPage,
-      'height': height, // New field
+      'height': height,
     };
   }
 }

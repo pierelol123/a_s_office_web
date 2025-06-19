@@ -12,7 +12,7 @@
       "buyers": [],
       "pageNumber": 3,
       "rowInPage": 1,
-      "height": 250.0
+      "height": 210.0
     },
     {
       "ProductID": 1750244036123,
@@ -26,10 +26,10 @@
       "buyers": [],
       "pageNumber": 3,
       "rowInPage": 2,
-      "height": 200.0
+      "height": 210.0
     },
     {
-      "ProductID": 1750244181692,
+      "ProductID": 1750241181692,
       "ProductName": "נייר צילום 80 גרם A3",
       "ProductPrice": 0.0,
       "ProductCapacity": 0,
@@ -40,12 +40,12 @@
       "buyers": [],
       "pageNumber": 3,
       "rowInPage": 3,
-      "height": 200.0
+      "height": 210.0
     }
   ],
   "metadata": {
     "totalProducts": 3,
-    "lastUpdated": "2025-06-18T13:59:31.747816",
+    "lastUpdated": "2025-06-19T01:33:35.026361",
     "version": "1.0"
   }
 }

@@ -2,6 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:a_s_office_web/model/Product.dart';
 import 'package:a_s_office_web/model/ImageUtils.dart';
 
+// ========== TEXT SIZE CONFIGURATION ==========
+// Normal Layout Text Sizes
+const double _NORMAL_TITLE_SIZE = 20.0; // Increased from ~16
+const double _NORMAL_DESCRIPTION_SIZE = 18.0; // Increased from ~12
+const double _NORMAL_PRICE_SIZE = 16.0; // Increased from ~14
+const double _NORMAL_ID_SIZE = 12.0; // Increased from ~10
+const double _NORMAL_SKU_SIZE = 12.0; // New SKU size
+const double _NORMAL_BUTTON_TEXT_SIZE = 14.0; // Increased from ~12
+const double _NORMAL_ERROR_TEXT_SIZE = 12.0; // Increased from ~10
+const double _NORMAL_LOADING_TEXT_SIZE = 12.0; // Increased from ~10
+const double _NORMAL_PLACEHOLDER_TEXT_SIZE = 12.0; // Increased from ~10
+
+// Compact Layout Text Sizes
+const double _COMPACT_TITLE_SIZE = 25.0; // Increased from 14
+const double _COMPACT_DESCRIPTION_SIZE = 16.0; // Increased from 11
+const double _COMPACT_PRICE_SIZE = 14.0; // Increased from 12
+const double _COMPACT_ID_SIZE = 12.0; // Increased from 10
+const double _COMPACT_SKU_SIZE = 12.0; // New SKU size
+const double _COMPACT_BUTTON_TEXT_SIZE = 13.0; // Increased from 11
+const double _COMPACT_ERROR_TEXT_SIZE = 10.0; // Increased from 8
+const double _COMPACT_LOADING_TEXT_SIZE = 10.0; // Increased from 8
+const double _COMPACT_PLACEHOLDER_TEXT_SIZE = 10.0; // Increased from 8
+
+// Icon Sizes
+const double _NORMAL_ICON_SIZE = 20.0; // Increased from 16
+const double _COMPACT_ICON_SIZE = 16.0; // Increased from 14
+const double _NORMAL_ERROR_ICON_SIZE = 40.0; // Increased from 32
+const double _COMPACT_ERROR_ICON_SIZE = 30.0; // Increased from 24
+const double _NORMAL_PLACEHOLDER_ICON_SIZE = 40.0; // Increased from 32
+const double _COMPACT_PLACEHOLDER_ICON_SIZE = 30.0; // Increased from 24
+
+// Contact Info Text Size
+const double _CONTACT_HEADER_SIZE = 20.0; // Increased from 18
+const double _CONTACT_INFO_SIZE = 18.0; // Increased from 16
+const double _LAST_UPDATED_SIZE = 16.0; // Increased from 14
+// =============================================
+
 class ProductCard extends StatefulWidget {
   final Product product;
   final VoidCallback? onTap;
@@ -77,7 +114,7 @@ class _ProductCardState extends State<ProductCard> {
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: _isHovered ? Colors.blue[700] : null,
-                    fontSize: 14,
+                    fontSize: _COMPACT_TITLE_SIZE,
                   ),
                   maxLines: 100,
                   overflow: TextOverflow.ellipsis,
@@ -89,12 +126,25 @@ class _ProductCardState extends State<ProductCard> {
                   widget.product.description,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.grey[600],
-                    fontSize: 11,
+                    fontSize: _COMPACT_DESCRIPTION_SIZE,
                   ),
                   maxLines: 100,
                   overflow: TextOverflow.ellipsis,
                   textDirection: TextDirection.rtl,
                 ),
+                // SKU (if available)
+                if (widget.product.productSku != null && widget.product.productSku!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'מק״ט: ${widget.product.productSku}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[500],
+                      fontSize: _COMPACT_SKU_SIZE,
+                    ),
+                    textDirection: TextDirection.rtl,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 const Spacer(),
                 // Price and ID
                 Row(
@@ -102,10 +152,10 @@ class _ProductCardState extends State<ProductCard> {
                   children: [
                     Flexible(
                       child: Text(
-                        'מק"ט: ${widget.product.productID}',
+                        'ID: ${widget.product.productID}', // Changed back to ID
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[500],
-                          fontSize: 10,
+                          fontSize: _COMPACT_ID_SIZE,
                         ),
                         textDirection: TextDirection.rtl,
                         overflow: TextOverflow.ellipsis,
@@ -124,8 +174,8 @@ class _ProductCardState extends State<ProductCard> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: widget.onTap,
-                        icon: const Icon(Icons.edit, size: 14),
-                        label: const Text('ערוך', style: TextStyle(fontSize: 11)),
+                        icon: Icon(Icons.edit, size: _COMPACT_ICON_SIZE),
+                        label: Text('ערוך', style: TextStyle(fontSize: _COMPACT_BUTTON_TEXT_SIZE)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[600],
                           foregroundColor: Colors.white,
@@ -141,8 +191,8 @@ class _ProductCardState extends State<ProductCard> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _showDeleteConfirmation(context),
-                        icon: const Icon(Icons.delete, size: 14),
-                        label: const Text('מחק', style: TextStyle(fontSize: 11)),
+                        icon: Icon(Icons.delete, size: _COMPACT_ICON_SIZE),
+                        label: Text('מחק', style: TextStyle(fontSize: _COMPACT_BUTTON_TEXT_SIZE)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red[600],
                           foregroundColor: Colors.white,
@@ -169,9 +219,9 @@ class _ProductCardState extends State<ProductCard> {
             margin: const EdgeInsets.all(8),
             constraints: const BoxConstraints(
               maxWidth: 120,
-              maxHeight: 120,
+              maxHeight: double.infinity,
               minWidth: 120,
-              minHeight: 120,
+              minHeight: double.infinity,
             ), // Force exact dimensions
             child: _buildProductImage(),
           ),
@@ -188,8 +238,8 @@ class _ProductCardState extends State<ProductCard> {
           Expanded(
             child: ElevatedButton.icon(
               onPressed: widget.onTap,
-              icon: const Icon(Icons.edit, size: 16),
-              label: const Text('ערוך'),
+              icon: Icon(Icons.edit, size: _NORMAL_ICON_SIZE),
+              label: Text('ערוך', style: TextStyle(fontSize: _NORMAL_BUTTON_TEXT_SIZE)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[600],
                 foregroundColor: Colors.white,
@@ -204,8 +254,8 @@ class _ProductCardState extends State<ProductCard> {
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () => _showDeleteConfirmation(context),
-              icon: const Icon(Icons.delete, size: 16),
-              label: const Text('מחק'),
+              icon: Icon(Icons.delete, size: _NORMAL_ICON_SIZE),
+              label: Text('מחק', style: TextStyle(fontSize: _NORMAL_BUTTON_TEXT_SIZE)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red[600],
                 foregroundColor: Colors.white,
@@ -226,18 +276,20 @@ class _ProductCardState extends State<ProductCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'אישור מחיקה',
             textDirection: TextDirection.rtl,
+            style: TextStyle(fontSize: _NORMAL_TITLE_SIZE),
           ),
           content: Text(
             'האם אתה בטוח שברצונך למחוק את המוצר "${widget.product.productName}"?',
             textDirection: TextDirection.rtl,
+            style: TextStyle(fontSize: _NORMAL_DESCRIPTION_SIZE),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('ביטול'),
+              child: Text('ביטול', style: TextStyle(fontSize: _NORMAL_BUTTON_TEXT_SIZE)),
             ),
             TextButton(
               onPressed: () {
@@ -245,7 +297,7 @@ class _ProductCardState extends State<ProductCard> {
                 widget.onDelete?.call();
               },
               style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('מחק'),
+              child: Text('מחק', style: TextStyle(fontSize: _NORMAL_BUTTON_TEXT_SIZE)),
             ),
           ],
         );
@@ -254,76 +306,170 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Widget _buildProductImage() {
-    final imageUrl = ImageUtils.convertGoogleDriveUrl(widget.product.imagePath);
-    
-    return Container(
-      width: widget.isCompact ? 120 : null, // Force width for compact mode
-      height: widget.isCompact ? 120 : null, // Force height for compact mode
-      decoration: BoxDecoration(
-        borderRadius: widget.isCompact 
-            ? const BorderRadius.horizontal(right: Radius.circular(16))
-            : const BorderRadius.vertical(top: Radius.circular(16)),
-        color: Colors.grey[200],
-      ),
-      child: widget.product.imagePath.isNotEmpty && ImageUtils.isValidImageUrl(widget.product.imagePath)
-          ? ClipRRect(
-              borderRadius: widget.isCompact 
-                  ? const BorderRadius.horizontal(right: Radius.circular(16))
-                  : const BorderRadius.vertical(top: Radius.circular(16)),
+    if (widget.product.imagePath.isEmpty) {
+      return _buildPlaceholderImage();
+    }
+
+    // Use CORS proxy for all external images
+    String imageUrl = _getCorsProxiedUrl(widget.product.imagePath);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.network(
+        imageUrl,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print('Error loading image: $error, URL: $imageUrl');
+          // If proxy fails, try the original URL
+          if (imageUrl != widget.product.imagePath) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                imageUrl,
+                widget.product.imagePath,
+                width: double.infinity,
+                height: double.infinity,
                 fit: BoxFit.cover,
-                width: widget.isCompact ? 120 : double.infinity,
-                height: widget.isCompact ? 120 : double.infinity,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      color: Colors.blue[600],
-                    ),
-                  );
-                },
                 errorBuilder: (context, error, stackTrace) {
-                  print('Error loading image: $error');
-                  return _buildPlaceholderImage();
+                  return _buildErrorImage();
                 },
               ),
-            )
-          : _buildPlaceholderImage(),
+            );
+          }
+          return _buildErrorImage();
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildLoadingImage(loadingProgress);
+        },
+      ),
+    );
+  }
+
+  // Add this helper method to your ProductCard class
+  String _getCorsProxiedUrl(String originalUrl) {
+    // List of domains that typically have CORS issues
+    final corsProblematicDomains = [
+      'drive.google.com',
+      'googleusercontent.com', 
+      'docs.google.com',
+    ];
+    
+    // Check if the URL contains any problematic domains
+    bool needsProxy = corsProblematicDomains.any((domain) => originalUrl.contains(domain));
+    
+    if (needsProxy) {
+      // Use AllOrigins CORS proxy
+      return 'https://api.allorigins.win/raw?url=${Uri.encodeComponent(originalUrl)}';
+    }
+    
+    return originalUrl;
+  }
+
+  Widget _buildErrorImage() {
+    return Container(
+      width: double.infinity,
+      height: 120,
+      decoration: BoxDecoration(
+        color: Colors.red[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red[200]!, width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.broken_image,
+            color: Colors.red[400],
+            size: widget.isCompact ? _COMPACT_ERROR_ICON_SIZE : _NORMAL_ERROR_ICON_SIZE,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'שגיאה בטעינת תמונה',
+            style: TextStyle(
+              color: Colors.red[600],
+              fontSize: widget.isCompact ? _COMPACT_ERROR_TEXT_SIZE : _NORMAL_ERROR_TEXT_SIZE,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (!widget.isCompact) ...[
+            const SizedBox(height: 2),
+            Text(
+              'CORS/Network Error',
+              style: TextStyle(
+                color: Colors.red[400],
+                fontSize: widget.isCompact ? _COMPACT_ERROR_TEXT_SIZE - 2 : _NORMAL_ERROR_TEXT_SIZE - 2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingImage(ImageChunkEvent loadingProgress) {
+    return Container(
+      width: double.infinity,
+      height: 120,
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: widget.isCompact ? 24 : 28,
+            height: widget.isCompact ? 24 : 28,
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                  : null,
+              strokeWidth: 2,
+              color: Colors.blue[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'טוען תמונה...',
+            style: TextStyle(
+              color: Colors.blue[600],
+              fontSize: widget.isCompact ? _COMPACT_LOADING_TEXT_SIZE : _NORMAL_LOADING_TEXT_SIZE,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildPlaceholderImage() {
     return Container(
+      width: double.infinity,
+      height: 120,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: widget.isCompact 
-            ? const BorderRadius.horizontal(right: Radius.circular(16)) // Changed to right
-            : const BorderRadius.vertical(top: Radius.circular(16)),
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!, width: 1),
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.image_not_supported,
-              size: widget.isCompact ? 32 : 40,
-              color: Colors.grey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.image_outlined,
+            color: Colors.grey[400],
+            size: widget.isCompact ? _COMPACT_PLACEHOLDER_ICON_SIZE : _NORMAL_PLACEHOLDER_ICON_SIZE,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'אין תמונה',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: widget.isCompact ? _COMPACT_PLACEHOLDER_TEXT_SIZE : _NORMAL_PLACEHOLDER_TEXT_SIZE,
             ),
-            SizedBox(height: widget.isCompact ? 6 : 8),
-            Text(
-              'אין תמונה',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: widget.isCompact ? 12 : 12,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -339,6 +485,7 @@ class _ProductCardState extends State<ProductCard> {
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: _isHovered ? Colors.blue[700] : null,
+              fontSize: _NORMAL_TITLE_SIZE,
             ),
             maxLines: 100,
             overflow: TextOverflow.ellipsis,
@@ -349,11 +496,25 @@ class _ProductCardState extends State<ProductCard> {
             widget.product.description,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey[600],
+              fontSize: _NORMAL_DESCRIPTION_SIZE,
             ),
             maxLines: 100,
             overflow: TextOverflow.ellipsis,
             textDirection: TextDirection.rtl,
           ),
+          // SKU (if available) - Added under description
+          if (widget.product.productSku != null && widget.product.productSku!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'מק״ט: ${widget.product.productSku}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey[500],
+                fontSize: _NORMAL_SKU_SIZE,
+              ),
+              textDirection: TextDirection.rtl,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
           const Spacer(),
           _buildProductFooter(context),
         ],
@@ -366,9 +527,10 @@ class _ProductCardState extends State<ProductCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'מק"ט: ${widget.product.productID}',
+          'ID: ${widget.product.productID}', // Changed back to ID
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Colors.grey[500],
+            fontSize: _NORMAL_ID_SIZE,
           ),
           textDirection: TextDirection.rtl,
         ),
@@ -378,13 +540,15 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Widget _buildPriceWidget(BuildContext context) {
+    final fontSize = widget.isCompact ? _COMPACT_PRICE_SIZE : _NORMAL_PRICE_SIZE;
+    
     if (widget.product.productPrice > 0) {
       return Text(
         '₪${widget.product.productPrice.toStringAsFixed(0)}',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: _isHovered ? Colors.blue[800] : Colors.blue[600],
           fontWeight: FontWeight.bold,
-          fontSize: widget.isCompact ? 12 : null, // Smaller font for compact mode
+          fontSize: fontSize,
         ),
         textDirection: TextDirection.rtl,
         overflow: TextOverflow.ellipsis,
@@ -395,7 +559,7 @@ class _ProductCardState extends State<ProductCard> {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: _isHovered ? Colors.orange[800] : Colors.orange[600],
           fontWeight: FontWeight.w500,
-          fontSize: widget.isCompact ? 10 : null, // Smaller font for compact mode
+          fontSize: fontSize - 2, // Slightly smaller for this text
         ),
         textDirection: TextDirection.rtl,
         overflow: TextOverflow.ellipsis,
