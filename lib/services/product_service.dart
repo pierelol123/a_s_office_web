@@ -310,9 +310,21 @@ class ProductService {
     
     final lowerQuery = query.toLowerCase();
     return products.where((product) {
-      return product.productName.toLowerCase().contains(lowerQuery) ||
+      // Search in basic product fields
+      bool matches = product.productName.toLowerCase().contains(lowerQuery) ||
           product.description.toLowerCase().contains(lowerQuery) ||
-          (product.productSku?.toLowerCase().contains(lowerQuery) ?? false); // Add SKU to search
+          (product.productSku?.toLowerCase().contains(lowerQuery) ?? false);
+      
+      // Search in variants
+      if (!matches && product.hasVariants) {
+        matches = product.variants.any((variant) =>
+          variant.color.toLowerCase().contains(lowerQuery) ||
+          variant.sku.toLowerCase().contains(lowerQuery) ||
+          (variant.additionalNotes?.toLowerCase().contains(lowerQuery) ?? false)
+        );
+      }
+      
+      return matches;
     }).toList();
   }
 

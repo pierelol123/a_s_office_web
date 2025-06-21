@@ -7,7 +7,6 @@ class GoogleDriveService {
   static const _scopes = [drive.DriveApi.driveFileScope];
   static const String _shareWithEmail = 'aswebacc12@gmail.com'; // The Gmail account to share with
   
-  // Your actual Google Cloud service account credentials
 
 
   // Add method to find the shared folder
